@@ -9,6 +9,7 @@ public class Request implements Serializable{
 	
 	public ScalarClock timestamp;
 	
+	
 	public Request (ScalarClock t){
 		this.timestamp = t;
 	}
