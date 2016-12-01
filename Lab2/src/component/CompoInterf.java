@@ -14,6 +14,6 @@ public interface CompoInterf extends Remote{
 	public void receiveInquire(int procSInquireID)throws RemoteException,InterruptedException;
 	public void receiveRelease()throws RemoteException;
 	public void receiveRelinquish() throws RemoteException;
-	public void setID(int i)throws RemoteException;
-	public int getID()throws RemoteException;
+	//public void setID(int i)throws RemoteException;
+	//public int getID()throws RemoteException;
 }
