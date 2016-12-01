@@ -18,7 +18,7 @@ public class CompoInterfImpl extends UnicastRemoteObject implements CompoInterf 
 	private static final long serialVersionUID = -4138486202875827055L;
 
 	private int id;
-	private int numGrant;
+	private AtomicInteger numGrant;
 	private Integer[] setID;
 	private Request localrequest;
 	
@@ -36,17 +36,23 @@ public class CompoInterfImpl extends UnicastRemoteObject implements CompoInterf 
 	private Boolean postponed;
 	
 	
-	public CompoInterfImpl(Integer[] sets,int i, int times) throws RemoteException {
+	public CompoInterfImpl(Integer[] sets,int setSize,int i, int times) throws RemoteException {
 		super();
 		// TODO Auto-generated constructor stub
 		this.reqQ=new RequestQueue();
+		this.requestSet=new CompoInterf[sets.length];
 		//this.requestSendQ=new RequestQueue();
-		this.id=i;
+		this.id=i+1;
 		this.setID=sets;
 		this.localrequest=new Request(new ScalarClock(times,i));
 		
+		this.granted = false;
+		this.inquiring=false;
+		this.postponed=false;
+		this.numGrant=new AtomicInteger(0);
+		
 	}
-	
+	@Override
 	public void sendRequest() throws RemoteException, InterruptedException{
 		if(this.localrequest!=null){
 		   AtomicInteger sendCount=new AtomicInteger(setID.length);
@@ -66,6 +72,7 @@ public class CompoInterfImpl extends UnicastRemoteObject implements CompoInterf 
 		   while(sendCount.get()>0){
 			 Thread.sleep(10);
 		   }
+		   System.out.println("Request of"+this.id+"has been sent.");
 		   /*
 		   if(sendCount.get()==0){
 			 requestSendQ.poll();  //??:finish sending the first request
@@ -75,6 +82,7 @@ public class CompoInterfImpl extends UnicastRemoteObject implements CompoInterf 
 		
 		
 	}
+	@Override
 	public void receiveRequest(Request req)throws RemoteException{
 		if(this.granted==false){
 			this.current_grant=req.timestamp;
@@ -109,9 +117,10 @@ public class CompoInterfImpl extends UnicastRemoteObject implements CompoInterf 
 			}
 		}
 	}
+	@Override
 	public void receiveGrant()throws RemoteException, InterruptedException{
-		this.numGrant=numGrant+1;
-		if(numGrant==setID.length){
+		this.numGrant.incrementAndGet();
+		if(numGrant.get()==setID.length){
 			this.postponed=false;
 			/*
 			 * entering Critical Section
@@ -123,9 +132,11 @@ public class CompoInterfImpl extends UnicastRemoteObject implements CompoInterf 
 			}
 		}
 	}
+	@Override
 	public void receivePostponed()throws RemoteException{
 		this.postponed=true;
 	}
+	@Override
 	public void receiveInquire(int procSInquireID)throws RemoteException, InterruptedException{
 		int findPosInRS=0;
 		for(int i=0;i<this.setID.length;i++){
@@ -134,14 +145,15 @@ public class CompoInterfImpl extends UnicastRemoteObject implements CompoInterf 
                 break;
 			}
 		}
-		while((this.postponed==false)&&(this.numGrant<setID.length)){
+		while((this.postponed==false)&&(this.numGrant.get()<setID.length)){
 			Thread.sleep(5);
 		}
 		if(postponed==true){
-			this.numGrant=numGrant-1;
+			this.numGrant.decrementAndGet();
 			this.requestSet[findPosInRS].receiveRelinquish();
 		}
 	}
+	@Override
 	public void receiveRelease()throws RemoteException{
 		this.granted=false;
 		this.inquiring=false;
@@ -156,6 +168,7 @@ public class CompoInterfImpl extends UnicastRemoteObject implements CompoInterf 
 			}
 		}
 	}
+	@Override
 	public void receiveRelinquish() throws RemoteException{
 		this.inquiring=false;
 		this.granted=false;
@@ -171,10 +184,11 @@ public class CompoInterfImpl extends UnicastRemoteObject implements CompoInterf 
 		}
 		
 	}
+	@Override
 	public void setRegistrySet(CompoInterf[] c)throws RemoteException{
 		this.registrySet=c;
 	}
-	
+	@Override
 	public void setRequestSet(CompoInterf[] c)throws RemoteException{
 		for(int i=0;i<this.setID.length;i++){
 			requestSet[i]=c[setID[i]];
@@ -184,7 +198,7 @@ public class CompoInterfImpl extends UnicastRemoteObject implements CompoInterf 
 		this.id=i;
 	}
 	*/
-	
+	@Override
 	public int getID()throws RemoteException{
 		return this.id;
 	}

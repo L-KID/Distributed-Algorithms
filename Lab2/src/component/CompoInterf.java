@@ -16,4 +16,6 @@ public interface CompoInterf extends Remote{
 	public void receiveRelinquish() throws RemoteException;
 	//public void setID(int i)throws RemoteException;
 	public int getID()throws RemoteException;
+	public void setRegistrySet(CompoInterf[] c)throws RemoteException;
+	public void setRequestSet(CompoInterf[] c)throws RemoteException;
 }
