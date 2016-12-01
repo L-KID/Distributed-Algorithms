@@ -4,8 +4,8 @@ import java.io.Serializable;
 
 public class ScalarClock implements Serializable{
 	public static final long serialVersionUID = -2638475623163548223L;
-	int Time;
-	int ProcessID;
+	public int Time;//added public
+	public int ProcessID;//added public
 	
 	public ScalarClock(int t, int id){
 		Time = t;
@@ -17,6 +17,7 @@ public class ScalarClock implements Serializable{
 		if(scOrigin == null){
 			return true;
 		}
+		
 		else if(this.Time < scOrigin.Time){
 			return true;
 		}
