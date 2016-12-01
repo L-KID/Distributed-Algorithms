@@ -9,7 +9,10 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Scanner;
+<<<<<<< HEAD
 //import java.util.List;
+=======
+>>>>>>> 6010eb7a5f5e2c9c7f93b536c7c9abb516e1a869
 import java.io.File;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -26,6 +29,7 @@ public class Server {
 		java.rmi.registry.LocateRegistry.createRegistry(1099);
 		
 		Scanner s = new Scanner(System.in);
+<<<<<<< HEAD
 		System.out.println("Please enter the number of clients:");
 		clientNum =s.nextInt();
 		System.out.println("Please choose request set size (between " + (int) Math.ceil(Math.sqrt(clientNum)) + " and " + clientNum +").");
@@ -44,20 +48,39 @@ public class Server {
 			
 			String line = requestCFile.nextLine();
 			
+=======
+		clientNum =s.nextInt();
+		System.out.println("Please choose request set size (between " + (int) Math.ceil(Math.sqrt(clientNum)) + " and " + clientNum +").");
+		int setSize = s.nextInt();
+		s.close();
+		
+		Scanner requestCFile = new Scanner(new File("clientrequestset.txt"));
+		
+		
+		while(requestCFile.hasNextLine()){
+			String line = requestCFile.nextLine();
+			ArrayList<Integer> requestCSet = new ArrayList<Integer>();
+>>>>>>> 6010eb7a5f5e2c9c7f93b536c7c9abb516e1a869
 			
 			Scanner scanner = new Scanner(line);
 			scanner.useDelimiter(",");
 			while(scanner.hasNextInt()){
+<<<<<<< HEAD
 				requestCSet[i][j] = scanner.nextInt();
 				j++;
 			}
 			i++;
+=======
+				requestCSet.add(scanner.nextInt());
+			}
+>>>>>>> 6010eb7a5f5e2c9c7f93b536c7c9abb516e1a869
 			scanner.close();
 		}
 		requestCFile.close();
 		
 		System.out.println(requestCSet);
 		
+<<<<<<< HEAD
 		System.out.println("Please enter the time set for each client:");
 		String line1=s.nextLine();
 		String[] numbers1 = line1.split(" ");
@@ -69,6 +92,13 @@ public class Server {
 		for(i=0;i<clientNum; i++){
 			
 			registry.bind("client"+(i+1), new CompoInterfImpl(requestCSet[i],i,times[i]));
+=======
+		Integer[] times = {1,10,8,3,9,6,5};
+		
+		for(int i=0;i<clientNum; i++){
+			
+			registry.bind("client"+(i+1), new CompoInterf(requestCSet[i],i,times[i]));
+>>>>>>> 6010eb7a5f5e2c9c7f93b536c7c9abb516e1a869
 			
 		}
 		

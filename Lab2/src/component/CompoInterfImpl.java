@@ -19,13 +19,15 @@ public class CompoInterfImpl extends UnicastRemoteObject implements CompoInterf 
 
 	private int id;
 	private int numGrant;
-	private int[] setID;
+	private Integer[] setID;
 	private Request localrequest;
 	
+	private CompoInterf[] registrySet;
 	private RequestQueue reqQ;   //request queue in the algorithm
-	//private RequestQueue requestSendQ;//requests originated from ".txt"
 	private CompoInterf[] requestSet;
+	
 	private ScalarClock current_grant;
+	//private RequestQueue requestSendQ;//requests originated from ".txt"
 	/*
 	 * flags
 	 */
@@ -34,7 +36,7 @@ public class CompoInterfImpl extends UnicastRemoteObject implements CompoInterf 
 	private Boolean postponed;
 	
 	
-	protected CompoInterfImpl(int[] sets,int i, int times) throws RemoteException {
+	public CompoInterfImpl(Integer[] sets,int i, int times) throws RemoteException {
 		super();
 		// TODO Auto-generated constructor stub
 		this.reqQ=new RequestQueue();
@@ -77,7 +79,7 @@ public class CompoInterfImpl extends UnicastRemoteObject implements CompoInterf 
 		if(this.granted==false){
 			this.current_grant=req.timestamp;
 			try {
-				requestSet[req.timestamp.ProcessID].receiveGrant();
+				registrySet[req.timestamp.ProcessID].receiveGrant();
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -91,13 +93,13 @@ public class CompoInterfImpl extends UnicastRemoteObject implements CompoInterf 
 			this.reqQ.add(req);
 			if((this.reqQ.peek().timestamp.olderThan(req.timestamp))||
 				(this.current_grant.olderThan(req.timestamp))	){
-				requestSet[req.timestamp.ProcessID].receivePostponed();
+				registrySet[req.timestamp.ProcessID].receivePostponed();
 			}
 			else{
 				if(this.inquiring==false){
 					this.inquiring=true;
 					try {
-						requestSet[current_grant.ProcessID].receiveInquire(this.id);
+						registrySet[current_grant.ProcessID].receiveInquire(this.id);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -116,7 +118,7 @@ public class CompoInterfImpl extends UnicastRemoteObject implements CompoInterf 
 			 */
 			Thread.sleep((int)Math.random()*500);
 			for(int i=0;i<setID.length;i++){
-				CompoInterf reqSet_i=requestSet[i];
+				CompoInterf reqSet_i=this.requestSet[i];
 				reqSet_i.receiveRelease();
 			}
 		}
@@ -125,12 +127,19 @@ public class CompoInterfImpl extends UnicastRemoteObject implements CompoInterf 
 		this.postponed=true;
 	}
 	public void receiveInquire(int procSInquireID)throws RemoteException, InterruptedException{
+		int findPosInRS=0;
+		for(int i=0;i<this.setID.length;i++){
+			if (this.requestSet[i].getID()==procSInquireID){
+				findPosInRS=i;
+                break;
+			}
+		}
 		while((this.postponed==false)&&(this.numGrant<setID.length)){
 			Thread.sleep(5);
 		}
 		if(postponed==true){
 			this.numGrant=numGrant-1;
-			requestSet[procSInquireID].receiveRelinquish();
+			this.requestSet[findPosInRS].receiveRelinquish();
 		}
 	}
 	public void receiveRelease()throws RemoteException{
@@ -140,7 +149,7 @@ public class CompoInterfImpl extends UnicastRemoteObject implements CompoInterf 
 			this.current_grant=this.reqQ.poll().timestamp;
 			this.granted=true;
 			try {
-				requestSet[this.current_grant.ProcessID].receiveGrant();
+				registrySet[this.current_grant.ProcessID].receiveGrant();
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -155,22 +164,31 @@ public class CompoInterfImpl extends UnicastRemoteObject implements CompoInterf 
 		this.current_grant=this.reqQ.poll().timestamp;
 		this.granted=true;
 		try {
-			requestSet[current_grant.ProcessID].receiveGrant();
+			registrySet[current_grant.ProcessID].receiveGrant();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 	}
+	public void setRegistrySet(CompoInterf[] c)throws RemoteException{
+		this.registrySet=c;
+	}
+	
+	public void setRequestSet(CompoInterf[] c)throws RemoteException{
+		for(int i=0;i<this.setID.length;i++){
+			requestSet[i]=c[setID[i]];
+		}
+	}
 	/*public void setID(int i)throws RemoteException{
 		this.id=i;
 	}
 	*/
-	/*
+	
 	public int getID()throws RemoteException{
 		return this.id;
 	}
-	*/
+	
 	
 
 }
