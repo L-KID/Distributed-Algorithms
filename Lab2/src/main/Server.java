@@ -44,7 +44,7 @@ public class Server {
 		s.close();
 		
 		
-		Scanner requestCFile = new Scanner(new File("test/clientrequestset.txt"));
+		Scanner requestCFile = new Scanner(new File("test/client4size3.txt"));
 		Integer[][] requestCSet = new Integer[clientNum][setSize];
 		
 		
@@ -69,8 +69,9 @@ public class Server {
 		
 		System.out.println(requestCSet[1][2]);
 		
-		
-		Integer[] times = {1,10,8,3,9,6,5};
+		//Integer[][] test={{0,1,2},{1,4,6},{2,3,4},{0,3,6},{0,4,5},{1,3,5},{2,5,6}};
+		//Integer[] times = {1,10,8,3,9,6,5};
+		Integer[] times = {1,10,8,3};
 		
 		
 		
@@ -78,7 +79,7 @@ public class Server {
 			
 			//CompoInterf test = new CompoInterfImpl(requestCSet[k],setSize,k,times[k]);
 			//System.out.println(times[k]);
-			registry.bind("client"+(k+1), new CompoInterfImpl(requestCSet[k],setSize,k,times[k]));
+			java.rmi.Naming.bind("client"+k, new CompoInterfImpl(requestCSet[k],setSize,k,times[k]));
 			
 		}
 		
