@@ -84,7 +84,7 @@ public class Server {
 		}
 		
 		setRegistry();
-		totalRequest();
+//		totalRequest();
 		
 		System.out.println("start");
 		
@@ -105,7 +105,7 @@ public class Server {
 			RMI_IDS[i].setRequestSet(RMI_IDS);
 		}
 	}
-	
+/*	
 	public  void totalRequest() throws RemoteException, NotBoundException{
 		for(int i = 0; i<RMI_IDS.length; i++){
 			CompoInterf RMI = RMI_IDS[i];
@@ -119,7 +119,7 @@ public class Server {
 			}).start();
 		}
 	}
-
+*/
 
 }
 
