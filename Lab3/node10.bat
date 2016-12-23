@@ -1,0 +1,1 @@
+java -Djava.security.policy=my.policy Main 10 10 false 100 9
